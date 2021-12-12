@@ -26,11 +26,21 @@ function createGallery(galleryArr) {
 refs.gallery.insertAdjacentHTML(`beforeend`, createGallery(galleryItems));
 refs.gallery.addEventListener('click', selectGalleryItem);
 
-const instance = basicLightbox.create(`
+const instance = basicLightbox.create(
+  `
     <div class="modal">
         <img src="">
     </div>
-`);
+`,
+  {
+    onShow: instance => {
+      window.addEventListener('keydown', onEscapeClose);
+    },
+    onClose: instance => {
+      window.removeEventListener('keydown', onEscapeClose);
+    },
+  },
+);
 
 function selectGalleryItem(e) {
   e.preventDefault();
@@ -38,22 +48,13 @@ function selectGalleryItem(e) {
     return;
   }
   setInstanceUrl(e);
-  showModal();
-}
-
-function showModal() {
-  window.addEventListener('keydown', onEscapeClose);
   instance.show();
-}
-
-function closeModal() {
-  window.removeEventListener('keydown', onEscapeClose);
-  instance.close();
 }
 
 function onEscapeClose(e) {
   if (e.code === 'Escape') {
-    closeModal();
+    instance.close();
+    return;
   }
 }
 
